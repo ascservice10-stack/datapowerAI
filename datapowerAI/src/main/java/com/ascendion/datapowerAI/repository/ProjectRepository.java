@@ -1,0 +1,17 @@
+package com.ascendion.datapowerAI.repository;
+
+import com.ascendion.datapowerAI.entity.Project;
+import com.ascendion.datapowerAI.entity.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+public interface ProjectRepository extends JpaRepository<Project, UUID> {
+    Optional<Project> findById(UUID id);
+    List<Project> findByOwner(User owner);
+    List<Project> findByCreatedBy(User user);
+
+    List<Project> findByCreatedByUsername(String username);
+}
