@@ -3,6 +3,7 @@ package com.ascendion.datapowerAI.service;
 import com.ascendion.datapowerAI.dto.AuthResponse;
 import com.ascendion.datapowerAI.dto.LoginRequest;
 import com.ascendion.datapowerAI.entity.User;
+import com.ascendion.datapowerAI.exception.InvalidCredentialsException;
 import com.ascendion.datapowerAI.repository.RoleRepository;
 import com.ascendion.datapowerAI.repository.UserRepository;
 import com.ascendion.datapowerAI.security.JwtTokenProvider;
@@ -31,12 +32,12 @@ public class AuthService {
     public AuthResponse login(LoginRequest request) {
         var userOpt = userRepo.findByUsername(request.username());
         if (userOpt.isEmpty()) {
-            throw new RuntimeException("Invalid credentials");
+            throw new InvalidCredentialsException("Invalid credentials");
         }
 
         User user = userOpt.get();
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {
-            throw new RuntimeException("Invalid credentials");
+            throw new InvalidCredentialsException("Invalid credentials");
         }
 
         String token = jwtTokenProvider.createToken(user.getUsername());

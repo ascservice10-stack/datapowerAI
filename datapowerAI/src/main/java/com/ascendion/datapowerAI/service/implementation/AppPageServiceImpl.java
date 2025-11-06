@@ -3,6 +3,7 @@ package com.ascendion.datapowerAI.service.implementation;
 import com.ascendion.datapowerAI.entity.Component;
 import com.ascendion.datapowerAI.entity.Page;
 import com.ascendion.datapowerAI.entity.ProjectAppMapping;
+import com.ascendion.datapowerAI.exception.ResourceNotFoundException;
 import com.ascendion.datapowerAI.repository.ComponentRepository;
 import com.ascendion.datapowerAI.repository.PageRepository;
 import com.ascendion.datapowerAI.repository.ProjectAppMappingRepository;
@@ -27,10 +28,9 @@ public class AppPageServiceImpl implements AppPageService {
     @Transactional
     public List<Page> createPages(UUID projectId, UUID appId, List<Page> pages) {
 
-        // ✅ Find the mapping between project and app
         ProjectAppMapping mapping = projectAppMappingRepository
                 .findByProjectIdAndAppId(projectId, appId)
-                .orElseThrow(() -> new RuntimeException("Project-App mapping not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Project-App mapping not found"));
 
         for (Page page : pages) {
             page.setProjectAppMapping(mapping);
@@ -58,7 +58,7 @@ public class AppPageServiceImpl implements AppPageService {
     @Transactional
     public Page updatePage(UUID pageId, Page updatedPage) {
         Page existing = pageRepository.findById(pageId)
-                .orElseThrow(() -> new RuntimeException("Page not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Page not found"));
 
         existing.setName(updatedPage.getName());
         existing.setUpdatedAt(LocalDateTime.now());
@@ -71,7 +71,7 @@ public class AppPageServiceImpl implements AppPageService {
     @Transactional
     public void deletePage(UUID pageId) {
         if (!pageRepository.existsById(pageId)) {
-            throw new RuntimeException("Page not found");
+            throw new ResourceNotFoundException("Page not found");
         }
         pageRepository.deleteById(pageId);
     }

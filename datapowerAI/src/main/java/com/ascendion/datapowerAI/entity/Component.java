@@ -32,7 +32,6 @@ public class Component {
     @JsonBackReference("page-components")
     private Page page;
 
-    // ✅ JSONB column for flexible value storage
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
     private Object value;

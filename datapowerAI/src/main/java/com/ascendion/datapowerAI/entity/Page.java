@@ -27,11 +27,6 @@ public class Page {
     @Column(nullable = false)
     private String name;
 
-    /*@ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "app_id", nullable = false)
-    @JsonBackReference("app-pages")
-    private App app;*/
-
     private String createdBy;
     private String updatedBy;
 

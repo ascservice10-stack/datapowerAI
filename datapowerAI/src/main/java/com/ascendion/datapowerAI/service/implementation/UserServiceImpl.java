@@ -4,6 +4,8 @@ import com.ascendion.datapowerAI.dto.UserRegistrationRequest;
 import com.ascendion.datapowerAI.dto.UserResponse;
 import com.ascendion.datapowerAI.entity.Role;
 import com.ascendion.datapowerAI.entity.User;
+import com.ascendion.datapowerAI.exception.DuplicateResourceException;
+import com.ascendion.datapowerAI.exception.ResourceNotFoundException;
 import com.ascendion.datapowerAI.repository.RoleRepository;
 import com.ascendion.datapowerAI.repository.UserRepository;
 import com.ascendion.datapowerAI.service.UserService;
@@ -27,10 +29,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse registerUser(UserRegistrationRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already exists");
+            throw new DuplicateResourceException("Email already exists");
         }
         Role role = roleRepository.findByName(request.getRoleName())
-                .orElseThrow(() -> new RuntimeException("Role not found: " + request.getRoleName()));
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + request.getRoleName()));
 
         User user = User.builder()
                 .username(request.getUsername())
@@ -60,7 +62,7 @@ public class UserServiceImpl implements UserService {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         return toDto(user);
     }

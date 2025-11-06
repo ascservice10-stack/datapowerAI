@@ -39,8 +39,4 @@ public class App {
     @OneToMany(mappedBy = "app", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore // ✅ prevent recursion
     private List<ProjectAppMapping> projectMappings;
-
-    /*@OneToMany(mappedBy = "app", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonManagedReference("app-pages")
-    private List<Page> pages;*/
 }

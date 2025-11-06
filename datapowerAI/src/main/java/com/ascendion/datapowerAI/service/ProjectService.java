@@ -4,6 +4,9 @@ import com.ascendion.datapowerAI.entity.App;
 import com.ascendion.datapowerAI.entity.Project;
 import com.ascendion.datapowerAI.entity.ProjectAppMapping;
 import com.ascendion.datapowerAI.entity.User;
+import com.ascendion.datapowerAI.exception.BadRequestException;
+import com.ascendion.datapowerAI.exception.DuplicateResourceException;
+import com.ascendion.datapowerAI.exception.ResourceNotFoundException;
 import com.ascendion.datapowerAI.repository.AppRepository;
 import com.ascendion.datapowerAI.repository.ProjectAppMappingRepository;
 import com.ascendion.datapowerAI.repository.ProjectRepository;
@@ -26,7 +29,14 @@ public class ProjectService {
 
     public Project createProject(Project project, String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        if (project.getName() == null || project.getName().trim().isEmpty()) {
+            throw new BadRequestException("Project name cannot be empty");
+        }
+        boolean exists = projectRepository.existsByNameIgnoreCase(project.getName());
+        if (exists) {
+            throw new DuplicateResourceException("Project with name '" + project.getName() + "' already exists.");
+        }
         project.setCreatedBy(user);
         return projectRepository.save(project);
     }
@@ -38,9 +48,9 @@ public class ProjectService {
 
     public void mapProjectToApp(UUID projectId, UUID appId) {
         Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new RuntimeException("Project not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Project not found"));
         App app = appRepository.findById(appId)
-                .orElseThrow(() -> new RuntimeException("App not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("App not found"));
 
         ProjectAppMapping mapping = new ProjectAppMapping();
         mapping.setProject(project);
@@ -50,6 +60,6 @@ public class ProjectService {
 
     public Project getProjectDetails(UUID projectId) {
         return projectRepository.findById(projectId)
-                .orElseThrow(() -> new RuntimeException("Project not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Project not found"));
     }
 }
