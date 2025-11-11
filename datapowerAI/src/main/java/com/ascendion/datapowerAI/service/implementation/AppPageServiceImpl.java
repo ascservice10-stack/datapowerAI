@@ -63,6 +63,36 @@ public class AppPageServiceImpl implements AppPageService {
         existing.setName(updatedPage.getName());
         existing.setUpdatedAt(LocalDateTime.now());
         existing.setActive(updatedPage.isActive());
+        existing.setUpdatedBy(updatedPage.getUpdatedBy());
+
+        List<Component> updatedComponents = updatedPage.getComponents();
+
+        if (updatedComponents != null) {
+            // Remove components not present in the updated list
+            existing.getComponents().removeIf(existingComponent ->
+                    updatedComponents.stream().noneMatch(c -> c.getId() != null && c.getId().equals(existingComponent.getId()))
+            );
+
+            for (Component updatedComponent : updatedComponents) {
+                if (updatedComponent.getId() == null) {
+                    updatedComponent.setPage(existing);
+                    updatedComponent.setCreatedAt(LocalDateTime.now());
+                    updatedComponent.setCreatedBy(updatedPage.getUpdatedBy());
+                    existing.getComponents().add(updatedComponent);
+                } else {
+                    Component existingComponent = existing.getComponents().stream()
+                            .filter(c -> c.getId().equals(updatedComponent.getId()))
+                            .findFirst()
+                            .orElseThrow(() -> new ResourceNotFoundException("Component not found with ID: " + updatedComponent.getId()));
+
+                    existingComponent.setName(updatedComponent.getName());
+                    existingComponent.setValue(updatedComponent.getValue());
+                    existingComponent.setUpdatedAt(LocalDateTime.now());
+                    existingComponent.setUpdatedBy(updatedPage.getUpdatedBy());
+                    existingComponent.setActive(updatedComponent.isActive());
+                }
+            }
+        }
 
         return pageRepository.save(existing);
     }

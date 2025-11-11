@@ -1,0 +1,42 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: postgres-datapowerai
+    restart: always
+    environment:
+      POSTGRES_DB: datapowerai
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - datapower-net
+
+  datapowerai:
+    image: datapowerai:latest
+    container_name: datapowerai-app
+    restart: always
+    depends_on:
+      - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/datapowerai
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: admin
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "true"
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
+      SERVER_PORT: 8080
+    ports:
+      - "8080:8080"
+    networks:
+      - datapower-net
+
+networks:
+  datapower-net:
+
+volumes:
+  postgres_data:

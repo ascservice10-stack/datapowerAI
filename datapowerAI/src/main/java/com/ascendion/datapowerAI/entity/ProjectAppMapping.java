@@ -42,4 +42,8 @@ public class ProjectAppMapping {
     @JsonManagedReference("projectAppMapping-pages")
     private List<Page> pages;
 
+    @OneToMany(mappedBy = "projectAppMapping", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JsonManagedReference("projectAppMapping-globalComponents")
+    private List<GlobalComponent> globalComponents;
+
 }
